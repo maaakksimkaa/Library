@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout}"
+      lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Книги</title>
+  <style>
+    .book-link {
+      text-decoration: none;
+    }
+
+    .book-link:hover {
+      color: #001445;
+    }
+
+    .not-enough-book {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+<div layout:fragment="content">
+  <h1>Книги пользователя</h1>
+  <table class="table">
+    <thead>
+    <tr>
+      <th scope="col">Книга</th>
+      <th scope="col">Количество</th>
+      <th scope="col">Дата взятия книги</th>
+      <th scope="col">Дата возвращения</th>
+      <th scope="col">Возвращена</th>
+      <th scope="col">Период аренды</th>
+      <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <!--        Перебор пользователей-->
+    <tr th:each="publish: ${publishies}">
+      <td th:text="${publish.book.title}"></td>
+      <td th:text="${publish.amount}"></td>
+      <td th:text="
+          ${publish.rentDate.getDayOfMonth()} + '-' +
+          ${publish.rentDate.getMonthValue()} + '-' +
+          ${publish.rentDate.getYear()}">
+      </td>
+      <td th:if="${!publish.returned}" style="color: red" th:text="${publish.returnDate.getDayOfMonth()} + '-' + ${publish.returnDate.getMonthValue()} + '-' + ${publish.returnDate.getYear()} + ' (По плану)'"></td>
+      <td th:if="${publish.returned}"  th:text="${publish.returnDate.getDayOfMonth()} + '-' + ${publish.returnDate.getMonthValue()} + '-' + ${publish.returnDate.getYear()}"></td>
+      <td th:text="${publish.returned} ? 'Да' : 'Нет'"></td>
+      <td th:text="${publish.rentPeriod} + ' месяц(а)'"></td>
+      <td>
+
+        <!--        TODO доделать-->
+        <a
+            th:if="!${publish.returned}"
+            th:href="'/publish/return-book/' + ${publish.id}"
+            class="btn btn-primary"
+            role="button"
+            aria-disabled="true">Вернуть книгу</a>
+      </td>
+    </tr>
+
+    </tbody>
+  </table>
+
+  <nav aria-label="Pagination" th:if="${publishies.totalPages gt 0}">
+    <ul class="pagination justify-content-center font-weight-bold">
+      <li class="page-item" th:classappend="${publishies.number eq 0} ? 'disabled'">
+        <a class="page-link"
+           th:href="@{/publishies?page={id}(id=${publishies.number lt 2 ? 1 : publishies.number})}"
+           aria-label="Previous" title="Previous Page" data-toggle="tooltip">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item"
+          th:each="i : ${#numbers.sequence(1, publishies.totalPages, 1)}"
+          th:classappend="${i eq publishies.number + 1} ? 'active'">
+        <a class="page-link" th:href="@{/publishies?page={id}(id=${i})}" th:text="${i}"
+           th:title="${'Page '+ i}" data-toggle="tooltip"></a>
+      </li>
+      <li class="page-item" th:classappend="${publishies.number eq publishies.totalPages - 1} ? 'disabled'">
+        <a class="page-link"
+           th:href="@{/publishies?page={id}(id=${publishies.number + 2})}"
+           aria-label="Next" title="Next Page" data-toggle="tooltip">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+</body>
+</html>

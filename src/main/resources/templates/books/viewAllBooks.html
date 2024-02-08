@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout}"
+      lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Книги</title>
+  <style>
+    .book-link {
+      text-decoration: none;
+    }
+
+    .book-link:hover {
+      color: #001445;
+    }
+
+    .not-enough-book {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+<div layout:fragment="content">
+  <h1>Книги библиотеки</h1>
+
+  <!-- TODO Доделать создание-->
+  <div class="row">
+    <div class="col">
+      <a
+          sec:authorize="isAuthenticated() && (hasRole('ADMIN') || hasRole('LIBRARIAN'))"
+          href="books/add"
+          class="btn btn-secondary"
+          role="button"
+          style="float: right"
+          aria-disabled="true">Добавить книгу</a>
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col">
+      <form method="POST" action="books/search" th:object="${searchbooks}">
+        <div class="row">
+          <div class="col-auto">
+            <label for="authorFIO" class="col-form-label">ФИО автора</label>
+          </div>
+          <div class="col-10">
+            <input placeholder="Введите ФИО автора" type="text" id="authorFIO" class="form-control" name="authorFIO">
+          </div>
+          <div class="col-auto">
+            <!-- TODO Доделать поиск-->
+            <button type="submit" class="btn btn-primary">Поиск</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <table class="table">
+    <thead>
+    <tr>
+      <th scope="col">Название</th>
+      <th scope="col">Жанр</th>
+      <th scope="col">Место хранения</th>
+      <th scope="col">Количество</th>
+      <th scope="col">Год публикации</th>
+      <th scope="col">Автор(ы)</th>
+      <th sec:authorize="hasRole('ADMIN') || hasRole('LIBRARIAN')" scope="col">Статус</th>
+      <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book : ${books}">
+      <td>
+        <a class="book-link" th:href="'/books/' + ${book.id}" th:text="${book.getTitle()}"></a>
+      </td>
+      <td th:text="${book.genre.getGenreText()}"></td>
+      <td th:text="${book.storagePlace}"></td>
+      <td th:classappend="${book.getAmount() <= 0} ? 'not-enough-book'"
+          th:text="${book.amount} <= 0 ? 'Нет в наличии' : ${book.getAmount()}"></td>
+      <td th:text="${book.publishYear}"></td>
+      <td>
+        <ul>
+          <li th:each="author : ${book.authors}" th:text="${author.authorFIO}"></li>
+        </ul>
+      </td>
+      <td sec:authorize="hasRole('ADMIN') || hasRole('LIBRARIAN')" th:text="${book.isDeleted() ? 'Удалена' : 'Активна'}"></td>
+      <td>
+        <div sec:authorize="isAuthenticated() && (hasRole('ADMIN') || hasRole('LIBRARIAN'))">
+          <a th:if="${!book.isDeleted()}" class="btn btn-danger ms-1" th:href="'/books/block/' + ${book.id}">Заблокировать</a>
+          <a th:if="${book.isDeleted()}" class="btn btn-success ms-1" th:href="'/books/unblock/' + ${book.id}">Разблокировать</a>
+          <a class="btn btn-warning" th:href="'/books/update/' + ${book.id}">Обновить</a>
+        </div>
+        <a class="btn btn-success" th:href="'/books/' + ${book.id}">Просмотреть</a>
+        <a th:if="${book.getAmount() > 0}" sec:authorize="!hasRole('ADMIN')" class="btn btn-success" th:href="'/publish/get-book/' + ${book.id}">Взять книгу</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <nav aria-label="Pagination" th:if="${books.totalPages gt 0}">
+    <ul class="pagination justify-content-center font-weight-bold">
+      <li class="page-item" th:classappend="${books.number eq 0} ? 'disabled'">
+        <a class="page-link"
+           th:href="@{/books?page={id}(id=${books.number lt 2 ? 1 : books.number})}"
+           aria-label="Previous" title="Previous Page" data-toggle="tooltip">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item"
+          th:each="i : ${#numbers.sequence(1, books.totalPages, 1)}"
+          th:classappend="${i eq books.number + 1} ? 'active'">
+        <a class="page-link" th:href="@{/books?page={id}(id=${i})}" th:text="${i}"
+           th:title="${'Page '+ i}" data-toggle="tooltip"></a>
+      </li>
+      <li class="page-item" th:classappend="${books.number eq books.totalPages - 1} ? 'disabled'">
+        <a class="page-link"
+           th:href="@{/books?page={id}(id=${books.number + 2})}"
+           aria-label="Next" title="Next Page" data-toggle="tooltip">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+</body>
+</html>

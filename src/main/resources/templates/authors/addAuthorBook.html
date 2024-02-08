@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>Добавить книгу к автору</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <h1 th:text="'Добавить книгу к автору: ' + ${author}"></h1>
+
+  <form method="POST" th:action="@{/authors/add-book}" th:object="${authorBookForm}">
+    <input type="hidden" name="authorId" th:value="${authorId}">
+
+    <div class="mb-3">
+      <label for="book" class="form-label">Название книги</label>
+      <select class="form-control" name="bookId" id="book">
+        <option selected disabled value="0">Выберите книгу</option>
+        <option
+            th:each="book : ${books}"
+            th:value="${book.id}"
+            th:text="${book.title}">
+        </option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Добавить</button>
+  </form>
+</div>
+</body>
+</html>

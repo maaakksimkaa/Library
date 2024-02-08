@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>Обновить автора</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <h1>Обновить автора</h1>
+
+  <form method="POST" th:action="@{/authors/update}" th:object="${authorForm}">
+    <input type="hidden" th:value="${author.id}" name="id">
+    <div class="mb-3">
+      <label for="authorFIO" class="form-label">ФИО</label>
+      <input th:value="${author.authorFIO}" name="authorFIO" type="text" class="form-control" id="authorFIO">
+    </div>
+
+    <div class="mb-3">
+      <label for="lifePeriod" class="form-label">Годы жизни</label>
+      <input th:value="${author.lifePeriod}" name="lifePeriod" type="text" class="form-control" id="lifePeriod">
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Биография</label>
+      <input th:value="${author.description}" name="description" type="text" class="form-control" id="description">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Обновить</button>
+  </form>
+</div>
+</body>
+</html>

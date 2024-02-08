@@ -1,0 +1,22 @@
+<!--Добавление автобуса-->
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Книга</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <h3 th:text="${book.getTitle()}"></h3>
+
+  <p th:text="'Жанр: ' + ${book.getGenre().getGenreText()}"></p>
+  <p th:text="'Год издания:' + ${book.getPublishYear()}"></p>
+  <p th:text="'Авторы:'"></p>
+  <ul>
+    <li th:each="author : ${book.getAuthors()}" th:text="${author.getAuthorFIO()}"></li>
+  </ul>
+</div>
+</body>
+</html>
